@@ -33,10 +33,17 @@ fun main(args: Array<String>) {
 
     while (i <= (cycles * dayInCycle)) {
 
+
         println("Enter random for Demand")
         demand = randomNumberDemand(readln().toInt())
         shortage += if (isShortageCalculated) if ((invBegin - demand) < 0) abs(invBegin - demand) else 0 else 0
-        invEnd = if ((invBegin - demand) > 0) (invBegin - demand) else 0
+
+        if (i == todayTime){
+            invEnd = invBegin - demand - shortage
+            shortage = 0
+        }else{
+            invEnd = if ((invBegin - demand) > 0) (invBegin - demand) else 0
+        }
         if (i % dayInCycle == 0) {
             println("enter random number for lead time")
             leadTime = randomNumberLeadTime(readln().toInt())
@@ -53,7 +60,7 @@ fun main(args: Array<String>) {
             invBegin = invEnd + orderQuantity
             initialOrder = 0
             makeOrderQuantity = 0
-            shortage = 0
+
         }else{
             invBegin = invEnd
         }
