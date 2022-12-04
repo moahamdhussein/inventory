@@ -2,16 +2,20 @@ import kotlin.math.abs
 import kotlin.math.ceil
 
 fun main(args: Array<String>) {
-
-
     var demand: Int = 0
     var invEnd: Int = 0
-    var shortage: Int = 0
-    var makeOrderQuantity :Int = 0
-    var leadTime: Int = 0
-    var todayTime : Int = 0
-    var initialOrder :Int = 8
-    var orderQuantity: Int = makeOrderQuantity + initialOrder
+    var shortage = 0
+    var makeOrderQuantity = 0
+    var leadTime: Int
+    var todayTime: Int
+    var initialOrder = 8
+    var orderQuantity = makeOrderQuantity + initialOrder
+    var shortageTime = 0
+    var summationOfEnding = 0
+
+    val demandRandomNumber: MutableList<Int> =
+        mutableListOf(24, 35, 65, 81, 54, 3, 87, 27, 73, 70, 47, 45, 48, 17, 9, 42, 87, 26, 36, 40, 7, 63, 19, 88, 94)
+    val leadTimeRandomNumber: List<Int> = listOf(5, 0, 3, 4, 8)
     println("enter inventory stock size")
     val stockSize: Int = readln().toInt()
 
@@ -27,45 +31,52 @@ fun main(args: Array<String>) {
     println("enter initial Stock in inventory")
     var invBegin: Int = readln().toInt()
 
-    var i: Int = 1
+    var i = 1
     leadTime = 2
     todayTime = leadTime + i
-
+    println("cycle\tday\tinvBegin\tdemand\tinvEnd\tshortage\torder\tleadTime\t")
     while (i <= (cycles * dayInCycle)) {
 
+//        to use random number of section pdf
+//        demand = randomNumberDemand(demandRandomNumber[i-1])
 
-        println("Enter random for Demand")
-        demand = randomNumberDemand(readln().toInt())
+        demand = randomNumberDemand((0..100).random())
         shortage += if (isShortageCalculated) if ((invBegin - demand) < 0) abs(invBegin - demand) else 0 else 0
-
-        if (i == todayTime){
+        if (i == todayTime) {
             invEnd = invBegin - demand - shortage
             shortage = 0
-        }else{
+        } else {
             invEnd = if ((invBegin - demand) > 0) (invBegin - demand) else 0
         }
         if (i % dayInCycle == 0) {
-            println("enter random number for lead time")
-            leadTime = randomNumberLeadTime(readln().toInt())
+            leadTime = randomNumberLeadTime((0..9).random())
+
+//            to use random number in section pdf
+//            leadTime = randomNumberLeadTime(leadTimeRandomNumber[(i/5)-1])
+
             makeOrderQuantity = stockSize - invEnd + shortage
-            todayTime = i + leadTime +1
+            todayTime = i + leadTime + 1
             orderQuantity = makeOrderQuantity
-        }else{
-            leadTime = if((leadTime-1) >= 0) (leadTime-1) else 0
+        } else {
+            leadTime = if ((leadTime - 1) >= 0) (leadTime - 1) else 0
             makeOrderQuantity = 0
         }
-        println("cycle ${(ceil( (i.toDouble()/dayInCycle))).toInt()}\nday $i\ninvBegin $invBegin\ndemand $demand\ninvEnd $invEnd\nshortage $shortage\norder $makeOrderQuantity\nleadTime $leadTime \nin day number $todayTime")
+        summationOfEnding += invEnd
+        if (shortage > 0) shortageTime++
+        println("${(ceil((i.toDouble() / dayInCycle))).toInt()}\t\t$i\t\t$invBegin\t\t\t$demand\t\t$invEnd\t\t$shortage\t\t$makeOrderQuantity\t\t\t$leadTime")
         i++
-        if (i == todayTime){
+        if (i == todayTime) {
             invBegin = invEnd + orderQuantity
             initialOrder = 0
             makeOrderQuantity = 0
 
-        }else{
+        } else {
             invBegin = invEnd
         }
 
     }
+    println("The number of shortage times = $shortageTime times out of ${cycles * dayInCycle} days")
+    println("Average End of Inventory = %.2f".format(summationOfEnding.toDouble() / (cycles * dayInCycle)) + " units")
 
 
 }
